@@ -9,6 +9,7 @@ from argparse import ArgumentParser
 # COSC326 Etude 13 - Circle
 # Author - Finn Luxton 6362897
 
+hasInput = False
 generations = 3
 circles = []
 colorList = []
@@ -18,6 +19,7 @@ inputColor = []
 # Creates the main parent circle which will encompass all other inner circles
 def create_parent(parentRadius):
     global colorList, circles
+    print ("We are trying to times generation number " + str(printedGenerations)) + " with ratio " + str(ratio[printedGenerations])
     circle = plt.Circle((0, 0), radius = parentRadius, color=colorList[0])
     circles.append(circle)
 
@@ -31,7 +33,7 @@ def create_colors():
 
 # Creates a cluster of circles inside a parent circle
 def create_cluster(subX, subY, parentRadius, printedGenerations):
-    global colorList, circles
+    global colorList, circles, hasInput
 
     if printedGenerations == generations:   
         return None
@@ -54,21 +56,41 @@ def create_cluster(subX, subY, parentRadius, printedGenerations):
     circles.extend([circleC, circleL, circleR, circleTL, circleTR, circleBL, circleBR])
 
     if printedGenerations < generations:
-        # Left
-        create_cluster(subX-(2*parentRadius), subY, parentRadius * 0.333, printedGenerations + 1)
-        # Center
-        create_cluster(subX, subY, parentRadius * 0.333, printedGenerations + 1)
-        # Right
-        create_cluster(subX+(2*parentRadius), subY, parentRadius * 0.333, printedGenerations + 1)
-        # Top Left
-        create_cluster(subX-(parentRadius), subY + (int((1.75*parentRadius))), parentRadius * 0.333, printedGenerations + 1)
-        # Top Right
-        create_cluster(subX+(parentRadius), subY + (int((1.75*parentRadius))), parentRadius * 0.333, printedGenerations + 1)
-        # Bottom Left
-        create_cluster(subX-(parentRadius), subY - (int((1.75*parentRadius))), parentRadius * 0.333, printedGenerations + 1)
-        # Bottom Right
-        create_cluster(subX+(parentRadius), subY - (int((1.75*parentRadius))), parentRadius * 0.333, printedGenerations + 1)
+        if hasInput:
 
+            if printedGenerations is 1 or 2:
+                print ("Printed generations is " + str(printedGenerations) + ", its ratio is " + str(ratio[printedGenerations]) + ", parent radius is " + str(parentRadius) + ", new ratio is " + str(parentRadius * ratio[printedGenerations]))
+                
+            
+            # Left
+            create_cluster(subX-(2*parentRadius), subY, parentRadius * ratio[printedGenerations], printedGenerations + 1)
+            # Center
+            create_cluster(subX, subY, parentRadius * ratio[printedGenerations], printedGenerations + 1)
+            # Right
+            create_cluster(subX+(2*parentRadius), subY, parentRadius * ratio[printedGenerations], printedGenerations + 1)
+            # Top Left
+            create_cluster(subX-(parentRadius), subY + (int((1.75*parentRadius))), parentRadius * ratio[printedGenerations], printedGenerations + 1)
+            # Top Right
+            create_cluster(subX+(parentRadius), subY + (int((1.75*parentRadius))), parentRadius * ratio[printedGenerations], printedGenerations + 1)
+            # Bottom Left
+            create_cluster(subX-(parentRadius), subY - (int((1.75*parentRadius))), parentRadius * ratio[printedGenerations], printedGenerations + 1)
+            # Bottom Right
+            create_cluster(subX+(parentRadius), subY - (int((1.75*parentRadius))), parentRadius * ratio[printedGenerations], printedGenerations + 1)
+        else:
+            # Left
+            create_cluster(subX-(2*parentRadius), subY, parentRadius * 0.333, printedGenerations + 1)
+            # Center
+            create_cluster(subX, subY, parentRadius * 0.333, printedGenerations + 1)
+            # Right
+            create_cluster(subX+(2*parentRadius), subY, parentRadius * 0.333, printedGenerations + 1)
+            # Top Left
+            create_cluster(subX-(parentRadius), subY + (int((1.75*parentRadius))), parentRadius * 0.333, printedGenerations + 1)
+            # Top Right
+            create_cluster(subX+(parentRadius), subY + (int((1.75*parentRadius))), parentRadius * 0.333, printedGenerations + 1)
+            # Bottom Left
+            create_cluster(subX-(parentRadius), subY - (int((1.75*parentRadius))), parentRadius * 0.333, printedGenerations + 1)
+            # Bottom Right
+            create_cluster(subX+(parentRadius), subY - (int((1.75*parentRadius))), parentRadius * 0.333, printedGenerations + 1)
     return
 
 if __name__=='__main__':
@@ -83,6 +105,7 @@ if __name__=='__main__':
 
     if(args.file):
         with open(args.file) as file:
+            hasInput = True
             for line in open(args.file):
                 line = shlex.split(line)
                 lines.append(line)
@@ -94,8 +117,8 @@ if __name__=='__main__':
     ratio = []
     for i in lines: 
         ratio.append( float( Fraction(i[0])))
-        colorList.append([int(i[1])/255, int(i[2])/255, int(i[3])/255])
-        
+        colorList.append([float(i[1])/255, float(i[2])/255, float(i[3])/255])
+
     if(not args.file):
         create_colors()
 
@@ -110,7 +133,7 @@ if __name__=='__main__':
             create_cluster(0, 0, 300 * ratio[printedGenerations], printedGenerations)
         else:
             create_cluster(0, 0, 300 * 0.333, printedGenerations)
-
+    print generations
     graph_size = 300
     fig, ax = plt.subplots()
     c = 0
